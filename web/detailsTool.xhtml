@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <h:form id="detallesForm">
+
+            <div class="ui-fluid" style="margin: 25px">
+                <center><h2>Detalles</h2></center>
+                <p:panelGrid columns="2" columnClasses="ui-grid-col-2,ui-grid-col-10" layout="grid" styleClass="ui-panelgrid-blank">
+                    <p:outputLabel for="paramField" value="Parametro  "/>
+                    <p:inputText id="paramField" value="#{detalles.currentDetail.parametro}" required="true"/>
+
+                    <p:outputLabel for="showField" value="Show "/>
+                    <p:selectBooleanCheckbox  id="showField" value="#{detalles.currentDetail.showParam}" required="true"/>
+
+                    <p:outputLabel for="opcionalField" value="Opcional "/>
+                    <p:selectBooleanCheckbox  id="opcionalField" value="#{detalles.currentDetail.opcionalParam}" required="true"/>
+
+
+                    <p:outputLabel for="lugarSelect" value="Nombre equipo "/>
+                    <p:selectOneMenu id="lugarSelect" value="#{detalles.selected}" converter="nombreConverter" >
+                        <f:ajax event="change" execute="@this"  render="@this"/>
+                        <f:selectItem itemLabel="Select One" itemValue="" />
+                        <f:selectItems value="#{detalles.nombreEquipoList}" var="nombreEquipo" itemLabel="#{nombreEquipo.nombre}"  itemValue="#{nombreEquipo}" />
+                    </p:selectOneMenu>
+
+                    <p:commandButton value="Guardar" actionListener="#{detalles.guardarListener}"/>
+                </p:panelGrid>
+            </div>
+        </h:form>
+    </h:body>
+</html>
+
