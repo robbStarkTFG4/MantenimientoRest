@@ -18,10 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -154,7 +151,7 @@ public class FotosFacadeREST extends AbstractFacade<Fotos> {
             System.out.println("Valor " + name);
 
             if (name != null) {
-                System.out.println("es nulo");
+                //System.out.println("es nulo");
                 //File file = new File("C:\\Users\\NORE\\Pictures\\imagenesVolante\\cople.jpg");
                 File file = new File(System.getenv("OPENSHIFT_DATA_DIR") + "imagenes/" + name); // OPENSHIFT
                 Response.ResponseBuilder response = Response.ok((Object) file);
@@ -201,6 +198,15 @@ public class FotosFacadeREST extends AbstractFacade<Fotos> {
     @Produces({MediaType.APPLICATION_JSON})
     public List<Fotos> findAll() {
         return super.findAll();
+    }
+
+    @GET
+    @Path("orden/{id}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public List<Fotos> getPhotoObjects(@PathParam("id") int id) {
+        TypedQuery<Fotos> query = em.createQuery("SELECT c FROM Fotos c WHERE c.ordenIdorden.idorden = :id", Fotos.class);
+        query.setParameter("id", id);
+        return query.getResultList();
     }
 
     @GET

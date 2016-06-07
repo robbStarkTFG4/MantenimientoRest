@@ -81,7 +81,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Gson gson = new Gson();
 
         orden.setNumeroOrden("n/a");
-        orden.setEncargado("n/a");
+        //orden.setEncargado("n/a");
 
         orden.setEquipoIdequipo(eq);
         super.create(orden);

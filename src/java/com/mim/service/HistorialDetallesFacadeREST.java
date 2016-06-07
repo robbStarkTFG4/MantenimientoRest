@@ -88,6 +88,15 @@ public class HistorialDetallesFacadeREST extends AbstractFacade<HistorialDetalle
     }
 
     @GET
+    @Path("orden/{id}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public List<HistorialDetalles> retriveHistorial(@PathParam("id") Integer id) {
+        TypedQuery<HistorialDetalles> query = em.createQuery("SELECT c FROM HistorialDetalles c WHERE c.ordenIdorden.idorden = :id", HistorialDetalles.class);
+        query.setParameter("id", id);
+        return query.getResultList();
+    }
+
+    @GET
     @Override
     @Produces({MediaType.APPLICATION_JSON})
     public List<HistorialDetalles> findAll() {

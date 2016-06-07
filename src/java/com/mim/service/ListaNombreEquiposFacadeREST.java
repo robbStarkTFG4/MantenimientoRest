@@ -69,14 +69,15 @@ public class ListaNombreEquiposFacadeREST extends AbstractFacade<ListaNombreEqui
 
     /**
      * returns name object
+     *
      * @param id
-     * @return 
+     * @return
      */
     @GET
     @Path("nombre/{id}")
     @Produces({MediaType.APPLICATION_JSON})
     public ListaNombreEquipos getName(@PathParam("id") Integer id) {
-        TypedQuery<ListaNombreEquipos> query = em.createQuery("SELECT c FROM ListaNombreEquipos c WHERE c.idlistaNombre = :id",ListaNombreEquipos.class);
+        TypedQuery<ListaNombreEquipos> query = em.createQuery("SELECT c FROM ListaNombreEquipos c WHERE c.idlistaNombre = :id", ListaNombreEquipos.class);
         query.setParameter("id", id);
         return query.getSingleResult();
     }
@@ -109,7 +110,14 @@ public class ListaNombreEquiposFacadeREST extends AbstractFacade<ListaNombreEqui
     @Override
     @Produces({MediaType.APPLICATION_JSON})
     public List<ListaNombreEquipos> findAll() {
-        return super.findAll();
+        List<ListaNombreEquipos> list = super.findAll();
+        List<ListaNombreEquipos> filtered = new ArrayList<>();
+        for (ListaNombreEquipos l : list) {
+            if (!l.getNombre().equals("n/a")) {
+                filtered.add(l);
+            }
+        }
+        return filtered;
     }
 
     @GET
