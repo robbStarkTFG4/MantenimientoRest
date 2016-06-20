@@ -7,12 +7,12 @@ package com.mim.service;
 
 import com.google.gson.Gson;
 import com.mim.entities.Equipo;
-import com.mim.entities.Lugar;
+import com.mim.entities.Fotos;
+import com.mim.entities.HistorialDetalles;
 import com.mim.entities.Orden;
-import com.mim.session.beans.ListaNombreEquiposFacade;
+import java.io.File;
 import java.util.Date;
 import java.util.List;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -67,11 +67,24 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         return gson.toJson(orden);
     }
 
+    @GET
+    @Path("mark/{numero}")
+    public String marcarOrden(@PathParam("numero") String numero) {
+        int id = Integer.parseInt(numero);
+        TypedQuery<Orden> query = em.createQuery("SELECT c FROM Orden c WHERE c.idorden = :id", Orden.class);
+        query.setParameter("id", id);
+        Orden or = query.getSingleResult();
+        or.setEndDate(new Date());
+        Orden orden = new Orden(or.getIdorden());
+        Gson gson = new Gson();
+        return gson.toJson(orden);
+    }
+
     @POST
     @Path("reportphoto/{lugar}")
     @Consumes({MediaType.APPLICATION_JSON})
     public String uploadFotoReport(@PathParam("lugar") String lugar, Orden orden) {
-
+        //place choosen must have an equipment where barcode = "n/a"
         TypedQuery<Equipo> queryEquipo = em.createQuery("SELECT c FROM Equipo c WHERE c.codigoBarras = :codigo AND c.lugarIdlugar.nombre = :lug", Equipo.class);
         queryEquipo.setParameter("codigo", "n/a");
         queryEquipo.setParameter("lug", lugar);
@@ -81,7 +94,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Gson gson = new Gson();
 
         orden.setNumeroOrden("n/a");
-        //orden.setEncargado("n/a");
+        orden.setStartDate(new Date());
 
         orden.setEquipoIdequipo(eq);
         super.create(orden);
@@ -98,10 +111,32 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         super.edit(entity);
     }
 
-    @DELETE
-    @Path("{id}")
+    @GET
+    @Path("borrar/{id}")
     public void remove(@PathParam("id") Integer id) {
-        super.remove(super.find(id));
+        Orden or = super.find(id);
+        TypedQuery<Fotos> query = em.createQuery("SELECT c FROM Fotos c WHERE c.ordenIdorden.idorden = :idOrden", Fotos.class);
+        query.setParameter("idOrden", or.getIdorden());
+
+        for (Fotos ft : query.getResultList()) {
+            String[] split = ft.getArchivo().split("/");
+            int size = split.length;
+            final String name = split[size - 1];
+            File file = new File(System.getenv("OPENSHIFT_DATA_DIR") + "imagenes/" + name);
+
+            if (file.exists()) {
+                file.delete();
+            }
+
+            em.remove(ft);
+        }
+
+        for (HistorialDetalles hs : or.getHistorialDetallesList()) {
+            em.remove(hs);
+        }
+
+        em.remove(or);
+        //super.remove();
     }
 
     @GET
@@ -116,13 +151,6 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @Produces({MediaType.APPLICATION_JSON})
     public List<Orden> findAll() {
         return super.findAll();
-    }
-
-    @GET
-    @Path("{from}/{to}")
-    @Produces({MediaType.APPLICATION_JSON})
-    public List<Orden> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
-        return super.findRange(new int[]{from, to});
     }
 
     @GET

@@ -6,11 +6,9 @@
 package com.mim.session.beans;
 
 import com.mim.entities.Detalles;
-import com.mim.entities.ListaNombreEquipos;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 
 /**
  *
@@ -18,24 +16,21 @@ import javax.persistence.TypedQuery;
  */
 @Stateless
 public class DetallesFacade extends AbstractFacade<Detalles> {
-    
+
     @PersistenceContext(unitName = "MantenimientoRestPU")
     private EntityManager em;
-    
+
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
-    
+
     public DetallesFacade() {
         super(Detalles.class);
     }
-    
+
     public void create(Detalles currentDetail, String nombre) {
-        TypedQuery<ListaNombreEquipos> query = em.createQuery("SELECT c FROM ListaNombreEquipos c WHERE c.nombre = :id ", ListaNombreEquipos.class);
-        query.setParameter("id", nombre);
-        currentDetail.setListaNombreEquiposIdlistaNombre(query.getSingleResult());
-        this.create(currentDetail);
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
